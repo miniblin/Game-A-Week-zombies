@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Enemy
+  - Bullet
   layers:
   - Default
   - TransparentFX
@@ -13,8 +15,8 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
+  - Blocking
+  - Wall
   - 
   - 
   - 
@@ -40,4 +42,19 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Floor
+    uniqueID: 160162249
+    locked: 0
+  - name: Units
+    uniqueID: 2304273385
+    locked: 0
+  - name: Particles
+    uniqueID: 2552836351
+    locked: 0
+  - name: TreeTop
+    uniqueID: 3702278407
+    locked: 0
+  - name: New Layer
+    uniqueID: 3963319275
     locked: 0
