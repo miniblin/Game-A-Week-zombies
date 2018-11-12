@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour {
 
 	public LevelCreator levelCreatorScript;
-	private int level=15;
+	private int level=1;
 
 	// Use this for initialization
 	void Awake () {

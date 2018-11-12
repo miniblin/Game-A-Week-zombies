@@ -28,6 +28,7 @@ public class EnemyController : MonoBehaviour
     {
         rigid = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
+        
     }
 
 
@@ -59,6 +60,7 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
+            ScoreManager.IncrementKills();
             Instantiate(deathTile, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
