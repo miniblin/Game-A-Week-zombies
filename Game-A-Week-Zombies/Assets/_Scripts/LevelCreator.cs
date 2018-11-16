@@ -23,6 +23,12 @@ public class LevelCreator : MonoBehaviour
     int columns = 16;
     int rows = 16;
 
+    public int maxTunnels = 40;
+    public int maxLength = 10;
+
+
+    public int dimensions = 20;
+
     public GameObject[] enemies;
     public GameObject[] floorTiles;
     public GameObject[] leftWalls;
@@ -52,9 +58,9 @@ public class LevelCreator : MonoBehaviour
     void BoardSetup()
     {
         boardHolder = new GameObject("Board").transform;
-        for (int x = -columns; x < 2*columns + 1; x++)
+        for (int x = -columns; x < 2 * columns + 1; x++)
         {
-            for (int y = -rows; y < 2*rows + 1; y++)
+            for (int y = -rows; y < 2 * rows + 1; y++)
             {
                 GameObject toInstantiate = floorTiles[Random.Range(0, floorTiles.Length)];
                 if (x <= -1 || x >= columns || y >= rows || y <= -1)
@@ -84,7 +90,6 @@ public class LevelCreator : MonoBehaviour
 
                 instance = Instantiate(toInstantiate, new Vector3(x, y, 0f), Quaternion.identity) as GameObject;
                 instance.transform.SetParent(boardHolder);
-
             }
         }
     }
@@ -111,10 +116,114 @@ public class LevelCreator : MonoBehaviour
 
     public void setupScene(int level)
     {
-        BoardSetup();
-        InitializeList();
+        // BoardSetup();
+        // InitializeList();
 
-        int enemycount = level;
-        LayoutObjectAtRandom(enemies, enemycount, enemycount);
+        // int enemycount = level;
+        // LayoutObjectAtRandom(enemies, enemycount, enemycount);
+        int[][] map = CreateMap();
+       
+        instantiateMapGameobjects(map);       
+    }
+
+    public void instantiateMapGameobjects( int[][] map)
+    {
+        for (var i = 0; i < dimensions; i++)
+        {
+            for (var j = 0; j < dimensions; j++)
+            {
+                if (map[i][j] == 1)
+                {
+                    GameObject toInstantiate = treeTops[Random.Range(0, treeTops.Length)];
+                    GameObject instance = Instantiate(toInstantiate, new Vector3(i, j, 0f), Quaternion.identity) as GameObject;
+                    instance.transform.SetParent(boardHolder);
+                }
+                else if (map[i][j] == 0)
+                {
+                    // Debug.Log("Spawning floor tile");
+                    GameObject toInstantiate = floorTiles[Random.Range(0, floorTiles.Length)];
+                    GameObject instance = Instantiate(toInstantiate, new Vector3(i, j), Quaternion.identity) as GameObject;
+                    instance.transform.SetParent(boardHolder);
+                }
+            }
+        }
+    }
+
+    public int[][] CreateMap()
+    {
+        // Debug.Log("Creating map");
+        int[][] directions = new int[4][];
+        int[] lastDirection = new int[2], randomDirection;
+        //UP DOWN LLEFt AND RIGHT
+        directions[0] = new int[] { -1, 0 };
+        directions[1] = new int[] { 1, 0 };
+        directions[2] = new int[] { 0, -1 };
+        directions[3] = new int[] { 0, 1 };
+
+
+        int currentRow = 11;//Random.Range(0, dimensions);
+        int currentColumn =11;// Random.Range(0, dimensions);
+
+        bool reachedExit = false;
+
+        int[][] map = CreateArray(1, dimensions);
+        while (maxTunnels > 0 && dimensions > 0 && maxLength > 0 && !reachedExit)
+        {
+            // Debug.Log("map loop begun");
+            do
+            {
+                // Debug.Log("selecting random direction");
+                randomDirection = directions[Random.Range(0, directions.GetLength(0))];
+            } while ((randomDirection[0] == -lastDirection[0] &&
+              randomDirection[1] == -lastDirection[1]) ||
+             (randomDirection[0] == lastDirection[0] &&
+              randomDirection[1] == lastDirection[1]));
+
+
+            int randomLength = Random.Range(1, maxLength);
+            int tunnelLength = 0;
+
+            while (tunnelLength < randomLength)
+            {
+                // Debug.Log("Creating tunnel");
+                if (((currentRow <= 10) && (randomDirection[0] == -1)) ||
+                   ((currentColumn <= 10) && (randomDirection[1] == -1)) ||
+                   ((currentRow >= dimensions - 10) && (randomDirection[0] == 1)) ||
+                 ((currentColumn >= dimensions - 10) && (randomDirection[1] == 1)))
+                { break; }
+                
+                else
+                {
+
+                    map[currentRow][currentColumn] = 0;
+                    currentRow += randomDirection[0];
+                    currentColumn += randomDirection[1];
+                    tunnelLength++;
+                }
+            }
+            if (tunnelLength > 0)
+            {
+                // Debug.Log("Reducing max tunnels");
+                //does this make sense
+                lastDirection = randomDirection;
+                maxTunnels--;
+            }
+
+        }
+        return map;
+    }
+    public int[][] CreateArray(int num, int dimensions)
+    {
+        int[][] array = new int[dimensions][];
+        for (var i = 0; i < dimensions; i++)
+        {
+            array[i] = new int[dimensions];
+            for (var j = 0; j < dimensions; j++)
+            {
+                array[i][j] = num;
+            }
+        }
+        return array;
     }
 }
+

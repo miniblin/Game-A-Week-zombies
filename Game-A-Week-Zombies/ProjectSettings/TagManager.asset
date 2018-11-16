@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - Bullet
+  - Wall
   layers:
   - Default
   - TransparentFX
@@ -55,6 +56,6 @@ TagManager:
   - name: TreeTop
     uniqueID: 3702278407
     locked: 0
-  - name: New Layer
+  - name: Leaves
     uniqueID: 3963319275
     locked: 0

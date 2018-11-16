@@ -23,12 +23,24 @@ public class EnemyController : MonoBehaviour
 
     public GameObject deathTile;
 
+
+    public GameObject leaves;
+    AudioSource audioSource;
+    Object[] audioclips;
+
+
+    Object[] bloodSplatterClips;
     //Store our ship singleton!
     void Start()
     {
         rigid = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
-        
+
+        audioSource = GetComponent<AudioSource>();
+
+        audioclips = Resources.LoadAll("_Audio/Zombie", typeof(AudioClip));
+        bloodSplatterClips = Resources.LoadAll("_Audio/BloodSplatter", typeof(AudioClip));
+        StartCoroutine(SoundOut());
     }
 
 
@@ -50,6 +62,8 @@ public class EnemyController : MonoBehaviour
         if (velocity.magnitude > 0) transform.up = velocity;
 
 
+
+
     }
 
     void depleteHealth(int damage)
@@ -61,7 +75,7 @@ public class EnemyController : MonoBehaviour
         else
         {
             ScoreManager.IncrementKills();
-            Instantiate(deathTile, transform.position, Quaternion.identity);
+            Instantiate(deathTile, transform.position, Quaternion.identity);          
             Destroy(gameObject);
         }
     }
@@ -73,10 +87,10 @@ public class EnemyController : MonoBehaviour
     /// <param name="other">The other Collider2D involved in this collision.</param>
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("ZombieHit hit");
+        // Debug.Log("ZombieHit hit");
         if (other.gameObject.tag == "Bullet")
         {
-
+            audioSource.PlayOneShot((AudioClip)bloodSplatterClips[Random.Range(0, bloodSplatterClips.Length)],20f);
             StartCoroutine(PauseForSeconds(0.07f));
             GameObject splatterInstance = Instantiate(splatter, other.transform.position, Quaternion.identity);
             Destroy(splatterInstance, 0.5f);
@@ -98,6 +112,18 @@ public class EnemyController : MonoBehaviour
             t += Time.unscaledDeltaTime; // returns deltaTime without being multiplied by Time.timeScale
         }
         Time.timeScale = originalTimeScale; // restore time scale from before pause
-		depleteHealth(1);
+        depleteHealth(1);
+    }
+
+    IEnumerator SoundOut()
+    {
+        while (true)
+        {
+            if (!audioSource.isPlaying)
+            {
+                audioSource.PlayOneShot((AudioClip)audioclips[Random.Range(0, audioclips.Length)]);
+            }
+            yield return new WaitForSeconds(2f);
+        }
     }
 }

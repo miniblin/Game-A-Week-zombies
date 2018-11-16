@@ -13,6 +13,7 @@ public class ScoreManager : MonoBehaviour
     public Text scoreText;
 
     public Text killText;
+    public Text highKillText;
     public Text highScoreText;
 
     static private ScoreManager _S;
@@ -26,7 +27,7 @@ public class ScoreManager : MonoBehaviour
         {
             if (_S != null)
             {
-                Debug.Log("you are attempting to set S singleton a second time");
+                // Debug.Log("you are attempting to set S singleton a second time");
             }
             _S = value;
         }
@@ -35,16 +36,17 @@ public class ScoreManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-		S = this;
-        S.scoreText.text = "Day 0, hour 0";
+        S = this;
+        S.scoreText.text = "0";
         S.highScoreText.text = CreateHighScoreString(PlayerPrefs.GetInt("High Score"), true);
-        InvokeRepeating("IncrementScore", 10f, 10f);
+        S.highKillText.text = CreateHighScoreString(PlayerPrefs.GetInt("High Kill"), true);
+        InvokeRepeating("IncrementScore", 1f, 1f);
     }
 
     // Update is called once per frame
     public void IncrementScore()
     {
-        Debug.Log("Incrementing Score");
+        // Debug.Log("Incrementing Score");
         S.score += 1;
 
         S.scoreText.text = CreateHighScoreString(S.score);
@@ -58,20 +60,21 @@ public class ScoreManager : MonoBehaviour
 
     static public void IncrementKills()
     {
-        Debug.Log("Incrementing Score");
+        // Debug.Log("Incrementing Score");
         S.kills += 1;
 
-        S.killText.text = "Executions: " + S.kills;
+        S.killText.text = S.kills.ToString();
+        if (S.kills > PlayerPrefs.GetInt("High Kill"))
+        {
+            PlayerPrefs.SetInt("High Kill", S.kills);
+            S.highKillText.text = S.kills.ToString();
+        }
 
     }
 
     public String CreateHighScoreString(int score, bool isHighScore = false)
     {
-        int hours = score % 24;
-        int days = (score - hours) / 24;
-        return (bool)isHighScore ?
-        "Longest Survival:" + days + " days, " + hours + " hours " :
-        "Day " + days + ", hour " + hours;
+        return score.ToString();
     }
     public void SetHighScore()
     {

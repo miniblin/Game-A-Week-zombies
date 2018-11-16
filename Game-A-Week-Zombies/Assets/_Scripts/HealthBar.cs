@@ -7,17 +7,28 @@ public class HealthBar : MonoBehaviour
 
 
     public Image healthBar;
-    PlayerController player;
+
+    GameObject playerobj;
     void Start()
+    {
+        playerobj = GameObject.FindGameObjectWithTag("Player");
+    }
+
+    /// <summary>
+    /// OnGUI is called for rendering and handling GUI events.
+    /// This function can be called multiple times per frame (one call per event).
+    /// </summary>
+    void OnGUI()
     {
 
     }
+
     /// <summary>
     /// Update is called every frame, if the MonoBehaviour is enabled.
     /// </summary>
     void Update()
     {
-		Debug.Log(PlayerController.PLAYER_HEALTH);
-        healthBar.fillAmount = (PlayerController.PLAYER_HEALTH)/100;
+        transform.position = playerobj.transform.position;
+        healthBar.fillAmount = PlayerController.PLAYER_HEALTH/100;
     }
 }
