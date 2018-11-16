@@ -8,9 +8,9 @@ using Random = UnityEngine.Random;
 public class PlayerController : MonoBehaviour
 {
 
-    //Creating a ship singleton! Learn more about singletons Dave.
+    //Creating a player singleton! Learn more about singletons Dave.
     //A Design pattern from the Gang of four book
-    //This Can only be set privately from inside the calss
+    //This Can only be set privately from inside the class
 
 
     static private PlayerController _P;
@@ -49,8 +49,8 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         P = this;
-        audioSource = GetComponents<AudioSource>();
 
+        audioSource = GetComponents<AudioSource>();
         audioclips = Resources.LoadAll("_Audio/PlayerHurt", typeof(AudioClip));
         bulletClips = Resources.LoadAll("_Audio/Bullet", typeof(AudioClip));
         rigid = GetComponent<Rigidbody2D>();
@@ -63,12 +63,14 @@ public class PlayerController : MonoBehaviour
         {
             Fire();
         }
-        //using corss platform manager because later we will be using the tilt stuff!
+
+
+        // movement controlls
         float ax = Input.GetAxisRaw("Horizontal");
         float aY = Input.GetAxisRaw("Vertical");
 
         //normalize and multiply by max speed! (if at max direction)
-        Vector3 velocity = new Vector3(ax, aY); // has a two var constructor.
+        Vector3 velocity = new Vector3(ax, aY);
         if (velocity.magnitude > 1)
         {
             velocity.Normalize();
@@ -76,15 +78,17 @@ public class PlayerController : MonoBehaviour
         rigid.velocity = velocity * playerSpeed;
         if (velocity.magnitude > 0) { transform.up = velocity; }
 
-        if (playerHealth<=0){
-             GameObject go = Instantiate<GameObject>(playerSplat, transform.position,Quaternion.identity);        
-             gameObject.SetActive(false);
+        // kill player if health falls below zero.
+        if (playerHealth <= 0)
+        {
+            GameObject go = Instantiate<GameObject>(playerSplat, transform.position, Quaternion.identity);
+            gameObject.SetActive(false);
         }
     }
 
     void Fire()
     {
-        // Debug.Log("Firing");
+        //play audio, instantiate bullet and flash
         audioSource[0].PlayOneShot((AudioClip)bulletClips[Random.Range(0, bulletClips.Length)], 0.1f);
         GameObject go = Instantiate<GameObject>(bulletPrefab);
         GameObject flash = Instantiate(muzzleFlash, transform.position + transform.up * .6f, Quaternion.identity);
@@ -92,36 +96,19 @@ public class PlayerController : MonoBehaviour
         Destroy(flash, 0.02f);
 
         go.transform.position = transform.position + transform.up;
-
         go.transform.up = transform.up;
-
     }
 
-    
+    /*This functin did a bit more until The kill method moved to the update method */
     public static void DecrementHealth(int amount)
     {
-        
-            P.playerHealth -= amount;
-            //// Debug.Log(P.playerHealth);
-        
-       
 
-           
-            //stop timer
-            //play ending sound
+        P.playerHealth -= amount;
 
-            //then
-           
-            /*
-            kill player
-            display a restart message
-            restart scene
-             */
-        
     }
     void OnCollisionEnter2D(Collision2D other)
     {
-        // Debug.Log("Player Hit");
+        //on collision decrement health and move player backward
         if (other.gameObject.tag == "Enemy")
         {
             if (!audioSource[1].isPlaying)
@@ -131,7 +118,6 @@ public class PlayerController : MonoBehaviour
             GameObject splatterInstance = Instantiate(splatter, other.contacts[0].point, Quaternion.identity);
             Destroy(splatterInstance, 0.2f);
             DecrementHealth(5);
-            //Destroy(other.gameObject);
             transform.position = transform.position + (Vector3)(other.gameObject.GetComponent<Rigidbody2D>().velocity.normalized * .1f);
             other.gameObject.transform.position = other.transform.position - (Vector3)(other.gameObject.GetComponent<Rigidbody2D>().velocity.normalized * .1f);
         }

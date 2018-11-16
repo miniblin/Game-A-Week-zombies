@@ -41,92 +41,16 @@ public class LevelCreator : MonoBehaviour
     private Transform boardHolder;
     private List<Vector3> gridPositions = new List<Vector3>();
     // Use this for initialization
-    void InitializeList()
-    {
-        gridPositions.Clear();
-
-        for (int x = 1; x < columns - 1; x++)
-        {
-            for (int y = 1; y < rows - 1; y++)
-            {
-                gridPositions.Add(new Vector3(x, y, 0f));
-            }
-        }
-    }
-
-    // Update is called once per frame
-    void BoardSetup()
-    {
-        boardHolder = new GameObject("Board").transform;
-        for (int x = -columns; x < 2 * columns + 1; x++)
-        {
-            for (int y = -rows; y < 2 * rows + 1; y++)
-            {
-                GameObject toInstantiate = floorTiles[Random.Range(0, floorTiles.Length)];
-                if (x <= -1 || x >= columns || y >= rows || y <= -1)
-                {
-                    toInstantiate = treeTops[Random.Range(0, treeTops.Length)];
-                }
-
-                GameObject instance = Instantiate(toInstantiate, new Vector3(x, y, 0f), Quaternion.identity) as GameObject;
-                instance.transform.SetParent(boardHolder);
-
-                if (x == 0)
-                {
-                    toInstantiate = leftWalls[Random.Range(0, leftWalls.Length)];
-                }
-                else if (x == columns - 1)
-                {
-                    toInstantiate = rightWalls[Random.Range(0, rightWalls.Length)];
-                }
-                else if (y == 0)
-                {
-                    toInstantiate = bottomWalls[Random.Range(0, bottomWalls.Length)];
-                }
-                else if (y == rows - 1)
-                {
-                    toInstantiate = topWalls[Random.Range(0, topWalls.Length)];
-                }
-
-                instance = Instantiate(toInstantiate, new Vector3(x, y, 0f), Quaternion.identity) as GameObject;
-                instance.transform.SetParent(boardHolder);
-            }
-        }
-    }
-
-    Vector3 RandomPosition()
-    {
-        int randomIndex = Random.Range(0, gridPositions.Count);
-        Vector3 randomPosition = gridPositions[randomIndex];
-        gridPositions.RemoveAt(randomIndex);
-        return randomPosition;
-    }
 
 
-    void LayoutObjectAtRandom(GameObject[] tileArray, int minimum, int maximum)
-    {
-        int ObjectCount = Random.Range(minimum, maximum);
-        for (int i = 0; i < ObjectCount; i++)
-        {
-            Vector3 randomPosition = RandomPosition();
-            GameObject tileChoice = tileArray[Random.Range(0, tileArray.Length)];
-            Instantiate(tileChoice, randomPosition, Quaternion.identity);
-        }
-    }
 
     public void setupScene(int level)
     {
-        // BoardSetup();
-        // InitializeList();
-
-        // int enemycount = level;
-        // LayoutObjectAtRandom(enemies, enemycount, enemycount);
         int[][] map = CreateMap();
-       
-        instantiateMapGameobjects(map);       
+        instantiateMapGameobjects(map);
     }
 
-    public void instantiateMapGameobjects( int[][] map)
+    public void instantiateMapGameobjects(int[][] map)
     {
         for (var i = 0; i < dimensions; i++)
         {
@@ -149,9 +73,10 @@ public class LevelCreator : MonoBehaviour
         }
     }
 
+    /**Creates a jagged array representing the map. Uses a random walk to create the path starting from the player */
     public int[][] CreateMap()
     {
-        // Debug.Log("Creating map");
+
         int[][] directions = new int[4][];
         int[] lastDirection = new int[2], randomDirection;
         //UP DOWN LLEFt AND RIGHT
@@ -160,19 +85,20 @@ public class LevelCreator : MonoBehaviour
         directions[2] = new int[] { 0, -1 };
         directions[3] = new int[] { 0, 1 };
 
-
-        int currentRow = 11;//Random.Range(0, dimensions);
-        int currentColumn =11;// Random.Range(0, dimensions);
+        //start at player position. do more to randomise all this shit later
+        int currentRow = 11;
+        int currentColumn = 11;
 
         bool reachedExit = false;
 
         int[][] map = CreateArray(1, dimensions);
+
+        //doesnt have an exit yet. --variable unused.
         while (maxTunnels > 0 && dimensions > 0 && maxLength > 0 && !reachedExit)
         {
-            // Debug.Log("map loop begun");
             do
             {
-                // Debug.Log("selecting random direction");
+                //select a new random direction
                 randomDirection = directions[Random.Range(0, directions.GetLength(0))];
             } while ((randomDirection[0] == -lastDirection[0] &&
               randomDirection[1] == -lastDirection[1]) ||
@@ -185,13 +111,12 @@ public class LevelCreator : MonoBehaviour
 
             while (tunnelLength < randomLength)
             {
-                // Debug.Log("Creating tunnel");
                 if (((currentRow <= 10) && (randomDirection[0] == -1)) ||
                    ((currentColumn <= 10) && (randomDirection[1] == -1)) ||
                    ((currentRow >= dimensions - 10) && (randomDirection[0] == 1)) ||
                  ((currentColumn >= dimensions - 10) && (randomDirection[1] == 1)))
                 { break; }
-                
+
                 else
                 {
 
@@ -203,8 +128,6 @@ public class LevelCreator : MonoBehaviour
             }
             if (tunnelLength > 0)
             {
-                // Debug.Log("Reducing max tunnels");
-                //does this make sense
                 lastDirection = randomDirection;
                 maxTunnels--;
             }
@@ -227,3 +150,78 @@ public class LevelCreator : MonoBehaviour
     }
 }
 
+
+
+//   /*No longer used,  */
+//     void InitializeList()
+//     {
+//         gridPositions.Clear();
+
+//         for (int x = 1; x < columns - 1; x++)
+//         {
+//             for (int y = 1; y < rows - 1; y++)
+//             {
+//                 gridPositions.Add(new Vector3(x, y, 0f));
+//             }
+//         }
+//     }
+
+//     // Update is called once per frame
+//     void BoardSetup()
+//     {
+//         boardHolder = new GameObject("Board").transform;
+//         for (int x = -columns; x < 2 * columns + 1; x++)
+//         {
+//             for (int y = -rows; y < 2 * rows + 1; y++)
+//             {
+//                 GameObject toInstantiate = floorTiles[Random.Range(0, floorTiles.Length)];
+//                 if (x <= -1 || x >= columns || y >= rows || y <= -1)
+//                 {
+//                     toInstantiate = treeTops[Random.Range(0, treeTops.Length)];
+//                 }
+
+//                 GameObject instance = Instantiate(toInstantiate, new Vector3(x, y, 0f), Quaternion.identity) as GameObject;
+//                 instance.transform.SetParent(boardHolder);
+
+//                 if (x == 0)
+//                 {
+//                     toInstantiate = leftWalls[Random.Range(0, leftWalls.Length)];
+//                 }
+//                 else if (x == columns - 1)
+//                 {
+//                     toInstantiate = rightWalls[Random.Range(0, rightWalls.Length)];
+//                 }
+//                 else if (y == 0)
+//                 {
+//                     toInstantiate = bottomWalls[Random.Range(0, bottomWalls.Length)];
+//                 }
+//                 else if (y == rows - 1)
+//                 {
+//                     toInstantiate = topWalls[Random.Range(0, topWalls.Length)];
+//                 }
+
+//                 instance = Instantiate(toInstantiate, new Vector3(x, y, 0f), Quaternion.identity) as GameObject;
+//                 instance.transform.SetParent(boardHolder);
+//             }
+//         }
+//     }
+
+//     Vector3 RandomPosition()
+//     {
+//         int randomIndex = Random.Range(0, gridPositions.Count);
+//         Vector3 randomPosition = gridPositions[randomIndex];
+//         gridPositions.RemoveAt(randomIndex);
+//         return randomPosition;
+//     }
+
+
+//     void LayoutObjectAtRandom(GameObject[] tileArray, int minimum, int maximum)
+//     {
+//         int ObjectCount = Random.Range(minimum, maximum);
+//         for (int i = 0; i < ObjectCount; i++)
+//         {
+//             Vector3 randomPosition = RandomPosition();
+//             GameObject tileChoice = tileArray[Random.Range(0, tileArray.Length)];
+//             Instantiate(tileChoice, randomPosition, Quaternion.identity);
+//         }
+//     }

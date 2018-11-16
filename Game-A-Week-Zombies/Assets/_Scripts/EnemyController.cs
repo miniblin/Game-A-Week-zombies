@@ -46,7 +46,6 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
-        //using corss platform manager because later we will be using the tilt stuff!
         float ax = player.transform.position.x - transform.position.x;
         float aY = player.transform.position.y - transform.position.y;
 
@@ -75,7 +74,7 @@ public class EnemyController : MonoBehaviour
         else
         {
             ScoreManager.IncrementKills();
-            Instantiate(deathTile, transform.position, Quaternion.identity);          
+            Instantiate(deathTile, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
     }
@@ -90,7 +89,7 @@ public class EnemyController : MonoBehaviour
         // Debug.Log("ZombieHit hit");
         if (other.gameObject.tag == "Bullet")
         {
-            audioSource.PlayOneShot((AudioClip)bloodSplatterClips[Random.Range(0, bloodSplatterClips.Length)],20f);
+            audioSource.PlayOneShot((AudioClip)bloodSplatterClips[Random.Range(0, bloodSplatterClips.Length)], 20f);
             StartCoroutine(PauseForSeconds(0.07f));
             GameObject splatterInstance = Instantiate(splatter, other.transform.position, Quaternion.identity);
             Destroy(splatterInstance, 0.5f);
@@ -115,6 +114,7 @@ public class EnemyController : MonoBehaviour
         depleteHealth(1);
     }
 
+    /* play groan souond on loop every couple of seconds */
     IEnumerator SoundOut()
     {
         while (true)
